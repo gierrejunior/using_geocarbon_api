@@ -6,3 +6,5 @@ venv
 input/*
 output/*
 errors.csv
+download
+

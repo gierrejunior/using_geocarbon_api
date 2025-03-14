@@ -219,17 +219,17 @@ if __name__ == "__main__":
         raise ValueError("ACCESS_TOKEN environment variable not set")
 
     # MODIFICAR
-    FILE_PATH = "output/Tropoc_Geo_2024_v1_updated.xlsx"  # Caminho do arquivo com os IDs pode ser CSV ou Excel 
+    FILE_PATH = "input/Tropoc_Geo_2024_v1_updated.xlsx"  # Caminho do arquivo com os IDs pode ser CSV ou Excel 
     OUTPUT_FILE = "output/resultados.json" # Caminho do arquivo JSON de saída
     ID_COLUMN = "deforestation_2004_2023"  # Nome da coluna que contém os IDs a serem consultados
 
 
     # NÃO MODIFICAR
-    fetcher = DeforestationIDFetcher(
+    processor = DeforestationIDFetcher(
         access_token=ACCESS_TOKEN,
         api_url=API_URL,
         file_path=FILE_PATH,
         output_file=OUTPUT_FILE,
         id_column=ID_COLUMN,
     )
-    fetcher.processar()
+    processor.processar()

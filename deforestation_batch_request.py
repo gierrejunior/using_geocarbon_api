@@ -135,7 +135,7 @@ if __name__ == "__main__":
 
 
     # NÃO MODIFICAR
-    processador = DeforestationBatchRequestProcessor(
+    processor = DeforestationBatchRequestProcessor(
         access_token=ACCESS_TOKEN,
         api_url=API_URL,
         file_path=FILE_PATH,
@@ -143,5 +143,5 @@ if __name__ == "__main__":
         car_column=CAR_COLUMN,
         year_ranges=YEAR_RANGES,
     )
-    processador.processar()
+    processor.processar()
     print(f"Arquivo atualizado salvo em {OUTPUT_FILE}")

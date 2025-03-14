@@ -71,6 +71,8 @@ Aqui está uma breve descrição do que cada script faz:
 
 - `deforestation_batch_request.py`: Este script processa arquivos CSV ou Excel para realizar requisições à API e atualizar os dados conforme os códigos de imóvel (CAR) e os intervalos de anos fornecidos. Ele lê os dados de um arquivo CSV ou Excel, faz requisições POST para a API com esses dados e processa os resultados. Os resultados são exportados em um arquivo CSV.
 
+- `download.py`: Este script processa o download dos resultados de desmatamento e outros. Para cada ID do arquivo de entrada, gera a URL de download, baixa o arquivo, salva o link de download no DataFrame e exporta os resultados atualizados.
+
   ### Como usar
 
   1. Configure suas credenciais de API no arquivo `.env`.
@@ -84,4 +86,10 @@ Aqui está uma breve descrição do que cada script faz:
 
      ```bash
       python3 deforestation_batch_request.py
+      ```
+
+      ou
+
+     ```bash
+      python3 download.py
       ```
