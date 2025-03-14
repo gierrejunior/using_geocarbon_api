@@ -116,21 +116,25 @@ class DeforestationBatchRequestProcessor(APIClient, CSVProcessor):
 
 # Exemplo de utilização:
 if __name__ == "__main__":
+    #   NÃO MODIFICAR
+    API_URL = f"{os.getenv('API_BASE_URL')}/deforestation"
     ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
     if ACCESS_TOKEN is None:
         raise ValueError("ACCESS_TOKEN environment variable not set")
-    API_URL = f"{os.getenv('API_BASE_URL')}/deforestation"
-    FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"  # aceita excel ou csv
-    OUTPUT_FILE = "output/Tropoc_Geo_2024_v1_updated.xlsx"  # aceita excel ou csv
-    CAR_COLUMN = "CAR"  # Coluna que contém o código do imóvel
 
-    # Parâmetro dinâmico: pode ser um único intervalo ou uma lista de intervalos.
-    # Exemplo de um único intervalo:
-    # YEAR_RANGES = [2004, 2023]
-    # Exemplo de múltiplos intervalos:
-    # YEAR_RANGES = [[2004, 2023], [2010, 2015]]
-    YEAR_RANGES = [2004, 2023]
+    #   MODIFICAR
+    FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"  # Caminho do arquivo com os CODIMOVEL's pode ser CSV ou Excel 
+    OUTPUT_FILE = "output/Tropoc_Geo_2024_v1_updated.xlsx"  # Caminho do arquivo de saída
+    CAR_COLUMN = "CAR"  # Nome da Coluna que contém o código do imóvel
+    YEAR_RANGES = [2004, 2023] # Intervalo de anos para processamento
+        # Parâmetro dinâmico: pode ser um único intervalo ou uma lista de intervalos.
+        # Exemplo de um único intervalo:
+        # YEAR_RANGES = [2004, 2023]
+        # Exemplo de múltiplos intervalos:
+        # YEAR_RANGES = [[2004, 2023], [2010, 2015]]
 
+
+    # NÃO MODIFICAR
     processador = DeforestationBatchRequestProcessor(
         access_token=ACCESS_TOKEN,
         api_url=API_URL,

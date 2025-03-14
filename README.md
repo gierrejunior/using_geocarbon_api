@@ -22,8 +22,8 @@ Siga os passos abaixo para configurar o ambiente e instalar as dependências nec
 1. Clone o repositório para o seu ambiente local:
 
     ```bash
-    git clone https://github.com/seu-usuario/geocarbon.git
-    cd geocarbon/scripts_to_use_api
+    git clone https://github.com/gierrejunior/using_geocarbon_api.git
+    cd geocarbon/using_geocarbon_api
     ```
 
 2. Crie um ambiente virtual (opcional, mas recomendado):
@@ -83,6 +83,5 @@ Aqui está uma breve descrição do que cada script faz:
       ou
 
      ```bash
-      python deforestation_batch_request.py
-
+      python3 deforestation_batch_request.py
       ```
