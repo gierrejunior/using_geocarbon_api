@@ -30,7 +30,7 @@ import os
 import pandas as pd  # type: ignore
 import requests  # type: ignore
 from dotenv import load_dotenv  # type: ignore
-from tools import APIClient, CSVProcessor
+from tools.tools import APIClient, CSVProcessor
 
 # Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
