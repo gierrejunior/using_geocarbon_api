@@ -33,7 +33,13 @@ Siga os passos abaixo para configurar o ambiente e instalar as dependências nec
     source venv/bin/activate  # No Windows use `venv\Scripts\activate`
     ```
 
-3. Instale as dependências:
+3. Atualize o gerenciador de pacotes pip:
+
+    ```bash
+    pip install --upgrade pip
+    ```
+
+4. Instale as dependências:
 
     ```bash
     pip install -r requirements.txt
@@ -47,14 +53,14 @@ Siga os passos abaixo para usar os scripts:
     - Crie um arquivo `.env` na raiz do diretório `scripts_to_use_api` com o seguinte conteúdo:
 
         ```env
-        ACCESS_TOKEN=your_access_token_here
+        ACCESS_TOKEN=your_access_token_here # Token vence apśo 10 horas, após isso é necessário gerar um novo token usando a API de autenticação com login e senha
         API_BASE_URL=https://api.exemplo.com
         ```
 
 2. Execute o script desejado:
 
     ```bash
-    python nome_do_script.py
+    python3 nome_do_script.py
     ```
 
     Substitua `nome_do_script.py` pelo nome do script que você deseja executar.
