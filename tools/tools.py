@@ -18,7 +18,7 @@ Exemplos de uso:
 
     # Salvar os dados processados em um novo arquivo
     csv_processor.salvar_dados(output_file="caminho/para/arquivo_saida.csv")
-    """
+"""
 
 import os
 
@@ -67,7 +67,6 @@ class CSVProcessor:
         self.car_column = car_column
         self.df = self.carregar_dados()
 
-
     def carregar_dados(self) -> pd.DataFrame:
         """
         Carrega os dados do arquivo. Detecta o tipo do arquivo pela extensão.
@@ -83,7 +82,9 @@ class CSVProcessor:
                 raise ValueError("Formato de arquivo não suportado.")
 
             if self.car_column not in df.columns:
-                raise ValueError(f"Coluna '{self.car_column}' não encontrada no arquivo.")
+                raise ValueError(
+                    f"Coluna '{self.car_column}' não encontrada no arquivo."
+                )
             print(f"Arquivo {self.file_path} carregado com sucesso!")
             return df
         except Exception as e:
@@ -103,3 +104,28 @@ class CSVProcessor:
         except Exception as e:
             print(f"Erro ao salvar arquivo: {e}")
             raise
+
+
+class DocumentValidator:
+    """
+    Classe auxiliar para limpeza e validação de documentos.
+    """
+
+    @staticmethod
+    def clean_document(doc: str) -> str:
+        """Remove todos os caracteres não numéricos do documento."""
+        return "".join(filter(str.isdigit, doc))
+
+    @staticmethod
+    def is_valid(doc: str, document_type: str) -> bool:
+        """
+        Verifica se o documento limpo possui a quantidade correta de dígitos.
+        CPF deve ter 11 dígitos e CNPJ 14 dígitos.
+        """
+        cleaned = DocumentValidator.clean_document(doc)
+        if document_type.upper() == "CPF":
+            return len(cleaned) == 11
+        elif document_type.upper() == "CNPJ":
+            return len(cleaned) == 14
+        else:
+            raise ValueError("Tipo de documento inválido. Use 'CPF' ou 'CNPJ'.")
