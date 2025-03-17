@@ -14,7 +14,7 @@ Classes:
 Funções:
     buscar_dados(id_param: str) -> dict: Realiza uma requisição GET para a API usando
     o id_param na query string.
-    processar() -> None: Processa todos os IDs extraídos do arquivo, faz requisição GET para 
+    processar() -> None: Processa todos os IDs extraídos do arquivo, faz requisição GET para
     cada um e    verifica o status.
 
 Exemplo de utilização:
@@ -82,11 +82,10 @@ class DeforestationIDFetcher(APIClient, CSVProcessor):
             print(f"Erro ao buscar dados para o id {id_param}: {e}")
             return {}
 
-
     def processar(self) -> None:
         """
         Processa todos os IDs extraídos do arquivo: percorre a lista de IDs e faz requisição GET
-        para cada um, verificando se o status é COMPLETED (com "analysisResults") no 
+        para cada um, verificando se o status é COMPLETED (com "analysisResults") no
         primeiro registro        contido em "data". IDs que não completaram são reprocessados
         após 1 minuto, repetindo o ciclo
         até 10 vezes. IDs com status ERROR são imediatamente adicionados à lista de erros. Ao final,
@@ -137,7 +136,9 @@ class DeforestationIDFetcher(APIClient, CSVProcessor):
                             status == "COMPLETED"
                             and registro.get("analysisResults") is not None
                         ):
-                            print(f"ID {id_str} (registro {index}) COMPLETADO com sucesso.")
+                            print(
+                                f"ID {id_str} (registro {index}) COMPLETADO com sucesso."
+                            )
                             resultados["data"].append(resposta)
                         elif status in ["STARTING", "PROCESSING"]:
                             print(
@@ -170,7 +171,9 @@ class DeforestationIDFetcher(APIClient, CSVProcessor):
                             )
                             new_pending.append(item)
                 else:
-                    print(f"Nenhuma resposta válida para o ID {id_str} (registro {index}).")
+                    print(
+                        f"Nenhuma resposta válida para o ID {id_str} (registro {index})."
+                    )
                     new_pending.append(item)
 
             # Atualiza a lista de pendentes
@@ -213,16 +216,15 @@ class DeforestationIDFetcher(APIClient, CSVProcessor):
 # Exemplo de utilização:
 if __name__ == "__main__":
     # NÃO MODIFICAR
-    API_URL = f"{os.getenv('API_BASE_URL')}/deforestation" # URL da API
+    API_URL = f"{os.getenv('API_BASE_URL')}/deforestation"  # URL da API
     ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
     if ACCESS_TOKEN is None:
         raise ValueError("ACCESS_TOKEN environment variable not set")
 
     # MODIFICAR
-    FILE_PATH = "input/Tropoc_Geo_2024_v1_updated.xlsx"  # Caminho do arquivo com os IDs pode ser CSV ou Excel 
-    OUTPUT_FILE = "output/resultados.json" # Caminho do arquivo JSON de saída
+    FILE_PATH = "input/Tropoc_Geo_2024_v1_updated.xlsx"  # Caminho do arquivo, pode ser CSV ou Excel
+    OUTPUT_FILE = "output/resultados.json"  # Caminho do arquivo JSON de saída
     ID_COLUMN = "deforestation_2004_2023"  # Nome da coluna que contém os IDs a serem consultados
-
 
     # NÃO MODIFICAR
     processor = DeforestationIDFetcher(

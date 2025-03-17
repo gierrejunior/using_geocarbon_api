@@ -123,7 +123,7 @@ if __name__ == "__main__":
         raise ValueError("ACCESS_TOKEN environment variable not set")
 
     #   MODIFICAR
-    FILE_PATH = "input/Monteccer_2024_CAR.csv"  # Caminho do arquivo com os CODIMOVEL's pode ser CSV ou Excel
+    FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"  # Caminho do arquivo com os CODIMOVEL's pode ser CSV ou Excel
     OUTPUT_FILE = "output/Tropoc_Geo_2024_v1_updated.xlsx"  # Caminho do arquivo de saída
     CAR_COLUMN = "CAR"  # Nome da Coluna que contém o código do imóvel
     YEAR_RANGES = [2004, 2023] # Intervalo de anos para processamento

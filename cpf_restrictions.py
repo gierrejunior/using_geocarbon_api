@@ -129,9 +129,10 @@ class RestrictionChecker(APIClient, CSVProcessor):
                 resultados["data"].append(
                     {
                         "index": index,
-                        "document": cleaned_doc,
                         "status_code": response.status_code,
-                        "response": response_data,
+                        "document": str(doc),
+                        "document_type": self.document_type,
+                        "response": response_data.get("data").get("hasRestrictions"),
                     }
                 )
 

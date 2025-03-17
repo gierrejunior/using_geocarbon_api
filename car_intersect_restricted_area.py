@@ -110,7 +110,7 @@ class CarIntersectionChecker(APIClient, CSVProcessor):
                         "index": index,
                         "carIdentifier": car,
                         "status_code": response.status_code,
-                        "response": response_data,
+                        "response": response_data.get("data"),
                     }
                 )
 
