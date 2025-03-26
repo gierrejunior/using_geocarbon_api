@@ -75,7 +75,7 @@ class DeforestationIDFetcher(APIClient, CSVProcessor):
         """
         url = f"{self.api_url}?id={id_param}"
         try:
-            response = requests.get(url, headers=self.headers, timeout=10)
+            response = requests.get(url, headers=self.headers, timeout=60)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:

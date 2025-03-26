@@ -93,7 +93,7 @@ class CarIntersectionChecker(APIClient, CSVProcessor):
             payload = {"carIdentifier": str(car), "force": True}
             try:
                 response = requests.patch(
-                    self.api_url, json=payload, headers=self.headers, timeout=10
+                    self.api_url, json=payload, headers=self.headers, timeout=60
                 )
                 try:
                     response_data = response.json()

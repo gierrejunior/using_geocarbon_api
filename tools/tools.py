@@ -49,7 +49,7 @@ class APIClient:
         """
         try:
             response = requests.post(
-                self.api_url, json=payload, headers=self.headers, timeout=10
+                self.api_url, json=payload, headers=self.headers, timeout=60
             )
             return response
         except requests.exceptions.RequestException as e:

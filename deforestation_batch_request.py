@@ -30,6 +30,7 @@ import os
 import pandas as pd  # type: ignore
 import requests  # type: ignore
 from dotenv import load_dotenv  # type: ignore
+
 from tools.tools import APIClient, CSVProcessor
 
 # Carrega as variáveis de ambiente do arquivo .env
@@ -79,6 +80,7 @@ class DeforestationBatchRequestProcessor(APIClient, CSVProcessor):
                 print(f"Ignorando registro {index} pois o CAR está vazio.")
                 continue  # Pula linhas onde o código é NaN
 
+            car_code = str(car_code).strip()
             # Realiza as requisições para cada conjunto de anos passado como parâmetro
             for years in self.year_ranges:
                 payload = {"name": "test", "codImovel": car_code, "yearsBiomas": years}
@@ -126,7 +128,7 @@ if __name__ == "__main__":
     FILE_PATH = "input/Monteccer_2024_CAR.csv"  # Caminho do arquivo com os CODIMOVEL's pode ser CSV ou Excel
     OUTPUT_FILE = "output/Monteccer_2024_CAR_.csv"  # Caminho do arquivo de saída
     CAR_COLUMN = "CAR"  # Nome da Coluna que contém o código do imóvel
-    YEAR_RANGES = [2004, 2023] # Intervalo de anos para processamento
+    YEAR_RANGES = [2004, 2023]  # Intervalo de anos para processamento
     # Parâmetro dinâmico: pode ser um único intervalo ou uma lista de intervalos.
     # Exemplo de um único intervalo:
     # YEAR_RANGES = [2004, 2023]
@@ -143,4 +145,5 @@ if __name__ == "__main__":
         year_ranges=YEAR_RANGES,
     )
     processor.processar()
+    print(f"Arquivo atualizado salvo em {OUTPUT_FILE}")
     print(f"Arquivo atualizado salvo em {OUTPUT_FILE}")

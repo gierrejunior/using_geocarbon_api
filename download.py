@@ -115,7 +115,7 @@ class DeforestationDownloadProcessor(APIClient, CSVProcessor):
 
                         # Realiza o download do arquivo
                         file_response = requests.get(
-                            download_url, stream=True, timeout=10
+                            download_url, stream=True, timeout=60
                         )
                         file_response.raise_for_status()
 

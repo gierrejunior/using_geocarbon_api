@@ -110,7 +110,7 @@ class RestrictionChecker(APIClient, CSVProcessor):
             # Monta a URL com o parâmetro do documento
             url = f"{self.api_url}?{document_key}={cleaned_doc}"
             try:
-                response = requests.get(url, headers=self.headers, timeout=10)
+                response = requests.get(url, headers=self.headers, timeout=60)
                 try:
                     response_data = response.json()
                 except json.JSONDecodeError:
