@@ -144,7 +144,7 @@ if __name__ == "__main__":
         raise ValueError("API_BASE_URL não definido.")
 
     # MODIFICAR
-    FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"  # Caminho do arquivo com os CAR's
+    FILE_PATH = "input/Monteccer_2024_CAR.csv"  # Caminho do arquivo com os CAR's
     OUTPUT_FILE = "output/restrictedarea.json"  # Caminho para o arquivo JSON de saída
     ID_COLUMN = "CAR"  # Nome da coluna que contém os CAR's
 

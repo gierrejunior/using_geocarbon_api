@@ -119,14 +119,14 @@ class DeforestationBatchRequestProcessor(APIClient, CSVProcessor):
 # Exemplo de utilização:
 if __name__ == "__main__":
     #   NÃO MODIFICAR
-    API_URL = f"{os.getenv('API_BASE_URL')}/deforestation"
+    API_URL = f"{os.getenv('API_BASE_URL')}/deforestation/mapbiomas"
     ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
     if ACCESS_TOKEN is None:
         raise ValueError("ACCESS_TOKEN environment variable not set")
 
     #   MODIFICAR
-    FILE_PATH = "input/Monteccer_2024_CAR.csv"  # Caminho do arquivo com os CODIMOVEL's pode ser CSV ou Excel
-    OUTPUT_FILE = "output/Monteccer_2024_CAR_.csv"  # Caminho do arquivo de saída
+    FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"  # Caminho do arquivo com os CODIMOVEL's pode ser CSV ou Excel
+    OUTPUT_FILE = "output/Tropoc_Geo_2024_mapbiomas.csv"  # Caminho do arquivo de saída
     CAR_COLUMN = "CAR"  # Nome da Coluna que contém o código do imóvel
     YEAR_RANGES = [2004, 2023]  # Intervalo de anos para processamento
     # Parâmetro dinâmico: pode ser um único intervalo ou uma lista de intervalos.
