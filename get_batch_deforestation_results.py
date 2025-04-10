@@ -216,15 +216,15 @@ class DeforestationIDFetcher(APIClient, CSVProcessor):
 # Exemplo de utilização:
 if __name__ == "__main__":
     # NÃO MODIFICAR
-    API_URL = f"{os.getenv('API_BASE_URL')}/deforestation"  # URL da API
+    API_URL = f"{os.getenv('API_BASE_URL')}/deforestation/mapbiomas"  # URL da API
     ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
     if ACCESS_TOKEN is None:
         raise ValueError("ACCESS_TOKEN environment variable not set")
 
     # MODIFICAR
-    FILE_PATH = "input/Tropoc_Geo_2024_v1_updated.xlsx"  # Caminho do arquivo, pode ser CSV ou Excel
+    FILE_PATH = "input/Tropoc_Geo_2024_mapbiomas_deforestation_mapbiomas.csv"  # Caminho do arquivo, pode ser CSV ou Excel
     OUTPUT_FILE = "output/resultados.json"  # Caminho do arquivo JSON de saída
-    ID_COLUMN = "deforestation_2004_2023"  # Nome da coluna que contém os IDs a serem consultados
+    ID_COLUMN = "deforestation_2004_2005_2006_2007_2008_2009_2010_2023"  # Nome da coluna que contém os IDs a serem consultados
 
     # NÃO MODIFICAR
     processor = DeforestationIDFetcher(

@@ -154,13 +154,13 @@ if __name__ == "__main__":
         raise ValueError("ACCESS_TOKEN não definido.")
 
     # MODIFICAR SE NECESSÁRIO
-    # ENTITY_TYPE = "DeforestationAnalysis"
-    ENTITY_TYPE = "DeforestationAnalysisProdes"
+    ENTITY_TYPE = "DeforestationAnalysis"
+    # ENTITY_TYPE = "DeforestationAnalysisProdes"
 
     # MODIFICAR
-    FILE_PATH = "input/Tropoc_Geo_2024_prodes.csv"  # Pode ser um CSV ou Excel
-    OUTPUT_FILE = "output/Tropoc_Geo_2024_prodes_download.csv"
-    ID_COLUMN = "deforestation_prodes"  # Nome da coluna com os IDs
+    FILE_PATH = "input/Tropoc_Geo_2024_mapbiomas_deforestation_mapbiomas.csv"  # Pode ser um CSV ou Excel
+    OUTPUT_FILE = "output/Tropoc_Geo_2024_mapbiomas_deforestation_mapbiomas_download.csv"
+    ID_COLUMN = "deforestation_2004_2005_2006_2007_2008_2009_2010_2023"  # Nome da coluna com os IDs
 
     # NÃO MODIFICAR
     processor = DeforestationDownloadProcessor(

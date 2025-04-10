@@ -126,9 +126,9 @@ if __name__ == "__main__":
 
     #   MODIFICAR
     FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"  # Caminho do arquivo com os CODIMOVEL's pode ser CSV ou Excel
-    OUTPUT_FILE = "output/Tropoc_Geo_2024_mapbiomas.csv"  # Caminho do arquivo de saída
+    OUTPUT_FILE = "output/Tropoc_Geo_2024_mapbiomas_deforestation_mapbiomas.csv"  # Caminho do arquivo de saída
     CAR_COLUMN = "CAR"  # Nome da Coluna que contém o código do imóvel
-    YEAR_RANGES = [2004, 2023]  # Intervalo de anos para processamento
+    YEAR_RANGES = [2004,2005, 2006, 2007, 2008,2009,2010, 2023]  # Intervalo de anos para processamento
     # Parâmetro dinâmico: pode ser um único intervalo ou uma lista de intervalos.
     # Exemplo de um único intervalo:
     # YEAR_RANGES = [2004, 2023]

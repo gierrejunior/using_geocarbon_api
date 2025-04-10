@@ -168,8 +168,10 @@ if __name__ == "__main__":
         raise ValueError("ACCESS_TOKEN não definido.")
 
     # MODIFICAR
-    FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"  # Caminho do arquivo
-    OUTPUT_FILE = "output/cpf_restrictions.json"  # Caminho para o arquivo JSON de saída
+    FILE_PATH = "input/Tropoc_Geo_2024_mapbiomas.csv"  # Caminho do arquivo
+    OUTPUT_FILE = (
+        "output/Tropoc_Geo_2024_mapbiomas_cpf_restrictions.json"  # Caminho para o arquivo JSON de saída
+    )
     ID_COLUMN = "CPF_Produtor"  # Coluna que contém os CPF ou CNPJ
     DOCUMENT_TYPE = "CPF"  # Ou "CNPJ", conforme o tipo de documento
 

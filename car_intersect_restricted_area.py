@@ -2,20 +2,20 @@
 Módulo para verificação de interseção de CAR's com áreas restritas via API.
 
 Este módulo define a classe CarIntersectionChecker, que integra a funcionalidade de r
-equisições à API com o processamento de arquivos CSV ou Excel. Para cada CAR 
-(Cadastro Ambiental Rural) presente na coluna escolhida, é realizada uma requisição PATCH para o 
+equisições à API com o processamento de arquivos CSV ou Excel. Para cada CAR
+(Cadastro Ambiental Rural) presente na coluna escolhida, é realizada uma requisição PATCH para o
 endpoint /cars/check-intersection. A requisição envia o seguinte payload:
     {
         "carIdentifier": "<CAR>",
         "force": true
     }
-Ao enviar "force": true, o endpoint força o reprocessamento do CAR mesmo que já haja resultados 
+Ao enviar "force": true, o endpoint força o reprocessamento do CAR mesmo que já haja resultados
 salvos no banco de dados.  a API retorna os dados existentes, evitando processamento desnecessário.
 
 Os resultados de cada requisição são armazenados e, ao final, são exportados para um arquivo JSON.
 
 Uso:
-    1. Certifique-se de que as variáveis de ambiente (como ACCESS_TOKEN e API_BASE_URL) estejam 
+    1. Certifique-se de que as variáveis de ambiente (como ACCESS_TOKEN e API_BASE_URL) estejam
     definidas em um arquivo .env.
     2. Ajuste os parâmetros do script conforme necessário:
             - FILE_PATH: Caminho para o arquivo de entrada com os CAR's (CSV ou Excel).
@@ -41,12 +41,12 @@ class CarIntersectionChecker(APIClient, CSVProcessor):
     """
     Classe para verificar a interseção de CAR's com áreas restritas via API.
 
-    Para cada CAR presente no arquivo de entrada, monta a URL para acessar o endpoint 
-    /cars/check-intersection, realiza uma requisição PATCH enviando o payload 
+    Para cada CAR presente no arquivo de entrada, monta a URL para acessar o endpoint
+    /cars/check-intersection, realiza uma requisição PATCH enviando o payload
     {"carIdentifier": <CAR>, "force": true} e armazena o resultado.
 
-    Ao enviar "force": true, o endpoint força o reprocessamento do CAR mesmo que já 
-    haja resultados salvos no banco de dados, a API retorna os dados existentes 
+    Ao enviar "force": true, o endpoint força o reprocessamento do CAR mesmo que já
+    haja resultados salvos no banco de dados, a API retorna os dados existentes
     sem reprocessar.
 
     Ao final, os resultados são salvos em um arquivo JSON.
@@ -77,7 +77,7 @@ class CarIntersectionChecker(APIClient, CSVProcessor):
                 "carIdentifier": "<CAR>",
                 "force": true
             }
-        O parâmetro "force": true força o reprocessamento mesmo se os dados 
+        O parâmetro "force": true força o reprocessamento mesmo se os dados
         já estiverem salvos no banco, garantindo que sempre se obtenha a versão
         mais atualizada.
         """
@@ -144,8 +144,8 @@ if __name__ == "__main__":
         raise ValueError("API_BASE_URL não definido.")
 
     # MODIFICAR
-    FILE_PATH = "input/Monteccer_2024_CAR.csv"  # Caminho do arquivo com os CAR's
-    OUTPUT_FILE = "output/restrictedarea.json"  # Caminho para o arquivo JSON de saída
+    FILE_PATH = "input/Tropoc_Geo_2024_mapbiomas.csv"  # Caminho do arquivo com os CAR's
+    OUTPUT_FILE = "output/Tropoc_Geo_2024_mapbiomas_restricted_area.csv"  # Caminho para o arquivo JSON de saída
     ID_COLUMN = "CAR"  # Nome da coluna que contém os CAR's
 
     # NÃO MODIFICAR
