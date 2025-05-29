@@ -30,7 +30,9 @@ Exceções:
     durante o processamento.
 """
 
+import mimetypes
 import os
+from urllib.parse import urlparse
 
 import pandas as pd  # type: ignore
 import requests  # type: ignore
@@ -120,7 +122,22 @@ class DeforestationDownloadProcessor(APIClient, CSVProcessor):
                         file_response.raise_for_status()
 
                         # Define o caminho e nome do arquivo (por exemplo, um .zip)
-                        file_name = os.path.join(folder_id, f"{deforestation_id}.zip")
+                        # Extrai a parte do path da URL (antes dos query params)
+                        parsed = urlparse(download_url)
+                        ext = os.path.splitext(parsed.path)[1]
+                        # se não vier extensão na URL, tenta a partir do Content-Type
+                        if not ext:
+                            content_type = file_response.headers.get("Content-Type", "")
+                            ext = (
+                                mimetypes.guess_extension(content_type.split(";")[0])
+                                or ""
+                            )
+
+                        # monta o nome de arquivo com a extensão correta
+                        file_name = os.path.join(
+                            folder_id, f"{deforestation_id}{ext or '.bin'}"
+                        )
+
                         with open(file_name, "wb") as f:
                             for chunk in file_response.iter_content(chunk_size=8192):
                                 if chunk:
@@ -159,10 +176,8 @@ if __name__ == "__main__":
     ENTITY_TYPE = "ReportRestrictionsDetailed"
 
     # MODIFICAR
-    FILE_PATH = (
-        "output/Monteccer_2024_CAR_report_detailed.csv"  # Pode ser um CSV ou Excel
-    )
-    OUTPUT_FILE = "output/Monteccer_2024_CAR_report_detailed_download.csv"
+    FILE_PATH = "output/TROPOC_report_detailed.csv"  # Pode ser um CSV ou Excel
+    OUTPUT_FILE = "output/TROPOC_report_detailed_download.csv"
     ID_COLUMN = "restriction_id"  # Nome da coluna com os IDs
 
     # NÃO MODIFICAR
