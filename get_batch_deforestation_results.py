@@ -219,7 +219,7 @@ if __name__ == "__main__":
     # MODIFICAR
     FILE_PATH = "input/Tropoc_Geo_2024_mapbiomas_deforestation_mapbiomas.csv"  # Caminho do arquivo, pode ser CSV ou Excel
     OUTPUT_FILE = "output/resultados.json"  # Caminho do arquivo JSON de saída
-    ID_COLUMN = "deforestation_2004_2005_2006_2007_2008_2009_2010_2023"  # Nome da coluna que contém os IDs a serem consultados
+    ID_COLUMN = "deforestation_2004_2005_2006_2007_2008_2009_2010_2011_2012_2013_2014_2015_2016_2017_2018_2019_2020_2021_2022_2023"  # Nome da coluna que contém os IDs a serem consultados
     DEFORESTATION_TYPE = "mapbiomas"  # Tipo de desmatamento (mapbiomas ou prodes)
     # DEFORESTATION_TYPE = "prodes"  # Tipo de desmatamento (mapbiomas ou prodes)
 
