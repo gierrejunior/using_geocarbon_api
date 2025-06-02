@@ -108,8 +108,8 @@ if __name__ == "__main__":
         raise ValueError("ACCESS_TOKEN não definido em .env")
 
     # CONFIGURAÇÕES DO USUÁRIO
-    FILE_PATH = "input/TROPOC.xlsx"
-    OUTPUT_FILE = "output/TROPOC_report_detailed.csv"
+    FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"
+    OUTPUT_FILE = "output/TROPOC_teste.csv"
     CAR_COLUMN = "CAR"
     SHEET_NAME = None  # ou "Planilha1", se necessário
 
