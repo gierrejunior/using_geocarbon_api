@@ -1,5 +1,6 @@
 """
-Este módulo contém ferramentas para interagir com uma API de desmatamento e processar arquivos CSV ou Excel.
+Este módulo contém ferramentas para interagir com uma API de desmatamento e 
+processar arquivos CSV ou Excel.
 
 Classes:
     APIClient: Classe para realizar requisições à API de desmatamento.
@@ -26,8 +27,9 @@ import pandas as pd  # type: ignore
 import requests  # type: ignore
 
 # Cria os diretórios "input" e "output" se não existirem
-os.makedirs("input", exist_ok=True)
-os.makedirs("output", exist_ok=True)
+os.makedirs("files/input", exist_ok=True)
+os.makedirs("files/output", exist_ok=True)
+os.makedirs("files/downloads", exist_ok=True)
 
 
 class APIClient:

@@ -108,16 +108,22 @@ if __name__ == "__main__":
         raise ValueError("ACCESS_TOKEN não definido em .env")
 
     # CONFIGURAÇÕES DO USUÁRIO
-    FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"
-    OUTPUT_FILE = "output/TROPOC_teste.csv"
+    INPUT_FILE = "TROPOC_teste.xlsx"
+    OUTPUT_FILE = "TROPOC_teste_report.csv"
     CAR_COLUMN = "CAR"
     SHEET_NAME = None  # ou "Planilha1", se necessário
+
+    # NÃO MODIFICAR
+    INPUT_PATH = os.getenv("INPUT_DIR", ".") + "/" + INPUT_FILE
+    OUTPUT_PATH = os.getenv("OUTPUT_DIR", ".") + "/" + OUTPUT_FILE
+    if not os.path.exists(INPUT_PATH):
+        raise FileNotFoundError(f"Arquivo de entrada não encontrado: {INPUT_PATH}")
 
     processor = ReportRestrictionsBatchRequestProcessor(
         access_token=ACCESS_TOKEN,
         api_url=API_URL,
-        file_path=FILE_PATH,
-        output_file=OUTPUT_FILE,
+        file_path=INPUT_PATH,
+        output_file=OUTPUT_PATH,
         car_column=CAR_COLUMN,
         sheet_name=SHEET_NAME,
     )

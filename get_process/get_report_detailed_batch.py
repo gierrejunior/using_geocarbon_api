@@ -144,7 +144,7 @@ class ReportRestrictionsOneShotFetcher(APIClient):
                 self.df.at[idx, "taskStatus"] = err
                 # has_intersection continua False
                 print(f"{err} 🚨  has_intersection=False")
-            except Exception as e:
+            except (json.JSONDecodeError, KeyError, TypeError) as e:
                 self.df.at[idx, "taskStatus"] = "ERROR"
                 print(f"EXCEPTION 🚨 {e}  has_intersection=False")
 
@@ -166,16 +166,21 @@ if __name__ == "__main__":
     API_URL = f"{os.getenv('API_BASE_URL')}/report-detailed/restrictions"
 
     # ↙️ Ajuste aqui para o seu caso:
-    FILE_PATH = "output/TROPOC_teste.csv"
+    INPUT_FILE = "TROPOC_teste_report.csv"
     ID_COLUMN = "restriction_id"
     SHEET_NAME = (
         "reportResults"  # se for Excel com várias planilhas, coloque o nome da aba
     )
 
+    # NÃO MODIFICAR
+    INPUT_PATH = os.getenv("INPUT_DIR", ".") + "/" + INPUT_FILE
+    if not os.path.exists(INPUT_PATH):
+        raise FileNotFoundError(f"Arquivo de entrada não encontrado: {INPUT_PATH}")
+
     fetcher = ReportRestrictionsOneShotFetcher(
         access_token=ACCESS_TOKEN,
         api_url=API_URL,
-        file_path=FILE_PATH,
+        file_path=INPUT_PATH,
         id_column=ID_COLUMN,
         sheet_name=SHEET_NAME,
     )

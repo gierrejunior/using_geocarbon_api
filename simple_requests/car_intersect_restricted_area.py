@@ -93,7 +93,7 @@ class CarIntersectionChecker(APIClient, CSVProcessor):
             payload = {"carIdentifier": str(car), "force": True}
             try:
                 response = requests.patch(
-                    self.api_url, json=payload, headers=self.headers, timeout=60
+                    self.api_url, json=payload, headers=self.headers, timeout=200
                 )
                 try:
                     response_data = response.json()
@@ -144,16 +144,22 @@ if __name__ == "__main__":
         raise ValueError("API_BASE_URL não definido.")
 
     # MODIFICAR
-    FILE_PATH = "input/Tropoc_Geo_2024_mapbiomas.csv"  # Caminho do arquivo com os CAR's
-    OUTPUT_FILE = "output/Tropoc_Geo_2024_mapbiomas_restricted_area.csv"  # Caminho para o arquivo JSON de saída
+    INPUT_FILE = "TROPOC_teste.xlsx"  # Caminho do arquivo com os CAR's
+    OUTPUT_FILE = "TROPOC_teste_restricted_area.json"  # Caminho para o arquivo JSON de saída
     ID_COLUMN = "CAR"  # Nome da coluna que contém os CAR's
+
+    # NÃO MODIFICAR
+    INPUT_PATH = os.getenv("INPUT_DIR", ".") + "/" + INPUT_FILE
+    OUTPUT_PATH = os.getenv("OUTPUT_DIR", ".") + "/" + OUTPUT_FILE
+    if not os.path.exists(INPUT_PATH):
+        raise FileNotFoundError(f"Arquivo de entrada não encontrado: {INPUT_PATH}")
 
     # NÃO MODIFICAR
     processor = CarIntersectionChecker(
         access_token=ACCESS_TOKEN,
         api_base_url=API_BASE_URL,
-        file_path=FILE_PATH,
-        output_file=OUTPUT_FILE,
+        file_path=INPUT_PATH,
+        output_file=OUTPUT_PATH,
         id_column=ID_COLUMN,
     )
     processor.processar()

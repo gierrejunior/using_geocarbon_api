@@ -124,26 +124,32 @@ if __name__ == "__main__":
     if ACCESS_TOKEN is None:
         raise ValueError("ACCESS_TOKEN environment variable not set")
 
+
     #   MODIFICAR
-    FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"  # Caminho do arquivo com os CODIMOVEL's pode ser CSV ou Excel
-    OUTPUT_FILE = "output/Tropoc_Geo_2024_mapbiomas_deforestation_mapbiomas.csv"  # Caminho do arquivo de saída
+    INPUT_FILE = "TROPOC_teste.xlsx"
     CAR_COLUMN = "CAR"  # Nome da Coluna que contém o código do imóvel
-    YEAR_RANGES = [2004,2005, 2006, 2007, 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022, 2023]  # Intervalo de anos para processamento
+    OUTPUT_FILE = "TROPOC_teste_batch_2004_2022.csv"
+    # YEAR_RANGES = [[2004, 2022],[2021,2022]]  # Intervalo de anos para processamento
     # Parâmetro dinâmico: pode ser um único intervalo ou uma lista de intervalos.
     # Exemplo de um único intervalo:
-    # YEAR_RANGES = [2004, 2023]
+    YEAR_RANGES = [2004, 2023]
     # Exemplo de múltiplos intervalos:
     # YEAR_RANGES = [[2004, 2023], [2010, 2015]]
+
+    # NÃO MODIFICAR
+    INPUT_PATH = os.getenv("INPUT_DIR", ".") + "/" + INPUT_FILE
+    OUTPUT_PATH = os.getenv("OUTPUT_DIR", ".") + "/" + OUTPUT_FILE
+    if not os.path.exists(INPUT_PATH):
+        raise FileNotFoundError(f"Arquivo de entrada não encontrado: {INPUT_PATH}")
 
     # NÃO MODIFICAR
     processor = DeforestationBatchRequestProcessor(
         access_token=ACCESS_TOKEN,
         api_url=API_URL,
-        file_path=FILE_PATH,
-        output_file=OUTPUT_FILE,
+        file_path=INPUT_PATH,
+        output_file=OUTPUT_PATH,
         car_column=CAR_COLUMN,
         year_ranges=YEAR_RANGES,
     )
     processor.processar()
-    print(f"Arquivo atualizado salvo em {OUTPUT_FILE}")
     print(f"Arquivo atualizado salvo em {OUTPUT_FILE}")

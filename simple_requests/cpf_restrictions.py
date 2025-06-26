@@ -168,19 +168,25 @@ if __name__ == "__main__":
         raise ValueError("ACCESS_TOKEN não definido.")
 
     # MODIFICAR
-    FILE_PATH = "input/Tropoc_Geo_2024_mapbiomas.csv"  # Caminho do arquivo
+    INPUT_FILE = "Tropoc_Geo_2024_mapbiomas.csv"  # Caminho do arquivo
     OUTPUT_FILE = (
-        "output/Tropoc_Geo_2024_mapbiomas_cpf_restrictions.json"  # Caminho para o arquivo JSON de saída
+        "Tropoc_Geo_2024_mapbiomas_cpf_restrictions.json"  # Caminho para o arquivo JSON de saída
     )
     ID_COLUMN = "CPF_Produtor"  # Coluna que contém os CPF ou CNPJ
     DOCUMENT_TYPE = "CPF"  # Ou "CNPJ", conforme o tipo de documento
 
     # NÃO MODIFICAR
+    INPUT_PATH = os.getenv("INPUT_DIR", ".") + "/" + INPUT_FILE
+    OUTPUT_PATH = os.getenv("OUTPUT_DIR", ".") + "/" + OUTPUT_FILE
+    if not os.path.exists(INPUT_PATH):
+        raise FileNotFoundError(f"Arquivo de entrada não encontrado: {INPUT_PATH}")
+
+    # NÃO MODIFICAR
     processor = RestrictionChecker(
         access_token=ACCESS_TOKEN,
         api_base_url=API_BASE_URL,
-        file_path=FILE_PATH,
-        output_file=OUTPUT_FILE,
+        file_path=INPUT_PATH,
+        output_file=OUTPUT_PATH,
         id_column=ID_COLUMN,
         document_type=DOCUMENT_TYPE,
     )

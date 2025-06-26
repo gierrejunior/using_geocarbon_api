@@ -98,17 +98,23 @@ if __name__ == "__main__":
         raise ValueError("ACCESS_TOKEN environment variable not set")
 
     # MODIFICAR
-    FILE_PATH = "input/Tropoc_Geo_2024_v1.xls"  # Caminho do arquivo com os códigos de imóvel (CAR)
-    OUTPUT_FILE = "output/Tropoc_Geo_2024_prodes.csv"  # Caminho do arquivo de saída
+    INPUT_FILE = "TROPOC_teste.xlsx"  # Caminho do arquivo com os códigos de imóvel (CAR)
+    OUTPUT_FILE = "Tropoc_Geo_2024_prodes.csv"  # Caminho do arquivo de saída
     CAR_COLUMN = "CAR"  # Nome da coluna que contém o código do imóvel
+
+    # NÃO MODIFICAR
+    INPUT_PATH = os.getenv("INPUT_DIR", ".") + "/" + INPUT_FILE
+    OUTPUT_PATH = os.getenv("OUTPUT_DIR", ".") + "/" + OUTPUT_FILE
+    if not os.path.exists(INPUT_PATH):
+        raise FileNotFoundError(f"Arquivo de entrada não encontrado: {INPUT_PATH}")
 
     # NÃO MODIFICAR
     processor = DeforestationAnalysisProdesBatchRequestProcessor(
         access_token=ACCESS_TOKEN,
         api_url=API_URL,
-        file_path=FILE_PATH,
-        output_file=OUTPUT_FILE,
+        file_path=INPUT_PATH,
+        output_file=OUTPUT_PATH,
         car_column=CAR_COLUMN,
     )
     processor.processar()
-    print(f"Arquivo atualizado salvo em {OUTPUT_FILE}")
+    print(f"Arquivo atualizado salvo em {OUTPUT_PATH}")

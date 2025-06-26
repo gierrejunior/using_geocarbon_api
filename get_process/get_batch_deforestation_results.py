@@ -82,6 +82,64 @@ class DeforestationIDFetcher(APIClient, CSVProcessor):
             print(f"Erro ao buscar dados para o id {id_param}: {e}")
             return {}
 
+    def exportar_deforestation_changes_para_excel(
+        self, resultados: dict, output_excel: str
+    ) -> None:
+        """
+        Exporta os dados de 'deforestation_changes' do JSON de resultados para um arquivo Excel.
+        Cada linha corresponde a um par de anos comparados para um ID.
+        """
+        registros = []
+
+        for item in resultados.get("data", []):
+            id_ = item.get("id")
+            name = item.get("name")
+            car_id = item.get("carId")
+            cod_imovel = item.get("codImovel")
+
+            analysis_results = item.get("analysisResults", {})
+            def_changes = analysis_results.get("deforestation_changes", {})
+
+            for year_range, data in def_changes.items():
+                area = data.get("area", {})
+                percentages = data.get("percentages", {})
+
+                registro = {
+                    "id": id_,
+                    "name": name,
+                    "carId": car_id,
+                    "codImovel": cod_imovel,
+                    "year_range": year_range,
+                    "forest_decrease_area": area.get("forest_decrease_area"),
+                    "forest_increase_area": area.get("forest_increase_area"),
+                    "untouched_forest_area": area.get("untouched_forest_area"),
+                    "unchanged_non_forest_area": area.get("unchanged_non_forest_area"),
+                    "forest_decrease_percentage": percentages.get(
+                        "forest_decrease_percentage"
+                    ),
+                    "forest_increase_percentage": percentages.get(
+                        "forest_increase_percentage"
+                    ),
+                    "untouched_forest_percentage": percentages.get(
+                        "untouched_forest_percentage"
+                    ),
+                    "unchanged_non_forest_percentage": percentages.get(
+                        "unchanged_non_forest_percentage"
+                    ),
+                }
+
+                registros.append(registro)
+
+        if registros:
+            df = pd.DataFrame(registros)
+            try:
+                df.to_excel(output_excel, index=False)
+                print(f"Arquivo Excel salvo em {output_excel}")
+            except (IOError, OSError) as e:
+                print(f"Erro ao salvar o arquivo Excel: {e}")
+        else:
+            print("Nenhum dado de 'deforestation_changes' encontrado para exportação.")
+
     def processar(self) -> None:
         """
         Processa todos os IDs extraídos do arquivo: percorre a lista de IDs e faz requisição GET
@@ -202,6 +260,11 @@ class DeforestationIDFetcher(APIClient, CSVProcessor):
         except (IOError, OSError) as e:
             print(f"Erro ao salvar o arquivo JSON: {e}")
 
+        # Salva também os dados de deforestation_changes em XLSX
+        excel_output = self.output_file.replace(".json", "_deforestation_changes.xlsx")
+        self.exportar_deforestation_changes_para_excel(resultados, excel_output)
+        print(f"Arquivo Excel de deforestation_changes salvo em {excel_output}")
+
         # Se houver IDs com erro, exporta um CSV com eles na pasta raiz com detalhes do erro
         if self.error_ids:
             error_df = pd.DataFrame(self.error_ids)
@@ -217,9 +280,9 @@ class DeforestationIDFetcher(APIClient, CSVProcessor):
 if __name__ == "__main__":
 
     # MODIFICAR
-    FILE_PATH = "input/Tropoc_Geo_2024_mapbiomas_deforestation_mapbiomas.csv"  # Caminho do arquivo, pode ser CSV ou Excel
-    OUTPUT_FILE = "output/resultados.json"  # Caminho do arquivo JSON de saída
-    ID_COLUMN = "deforestation_2004_2005_2006_2007_2008_2009_2010_2011_2012_2013_2014_2015_2016_2017_2018_2019_2020_2021_2022_2023"  # Nome da coluna que contém os IDs a serem consultados
+    INPUT_FILE = "TROPOC_teste_batch_2004_2022.csv"  # Caminho do arquivo, pode ser CSV ou Excel
+    OUTPUT_FILE = "TROPOC_teste_batch_2004_2023.json"  # Caminho do arquivo JSON de saída
+    ID_COLUMN = "deforestation_2004_2022"  # Nome da coluna que contém os IDs a serem consultados
     DEFORESTATION_TYPE = "mapbiomas"  # Tipo de desmatamento (mapbiomas ou prodes)
     # DEFORESTATION_TYPE = "prodes"  # Tipo de desmatamento (mapbiomas ou prodes)
 
@@ -232,11 +295,17 @@ if __name__ == "__main__":
         raise ValueError("ACCESS_TOKEN environment variable not set")
 
     # NÃO MODIFICAR
+    INPUT_PATH = os.getenv("INPUT_DIR", ".") + "/" + INPUT_FILE
+    OUTPUT_PATH = os.getenv("OUTPUT_DIR", ".") + "/" + OUTPUT_FILE
+    if not os.path.exists(INPUT_PATH):
+        raise FileNotFoundError(f"Arquivo de entrada não encontrado: {INPUT_PATH}")
+
+    # NÃO MODIFICAR
     processor = DeforestationIDFetcher(
         access_token=ACCESS_TOKEN,
         api_url=API_URL,
-        file_path=FILE_PATH,
-        output_file=OUTPUT_FILE,
+        file_path=INPUT_PATH,
+        output_file=OUTPUT_PATH,
         id_column=ID_COLUMN,
     )
     processor.processar()
