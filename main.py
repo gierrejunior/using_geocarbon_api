@@ -13,57 +13,63 @@ instructions = """[bold yellow]Bem-vindo ao Sistema de Processamento de Requisi�
 1. [cyan]Cole a chave de autenticação no .env[/cyan]
 2. [cyan]Coloque os arquivos de input no seu respectivo diretório[/cyan]
 3. [cyan]Ajuste o nome do arquivo de input e output no script do processo[/cyan]
-4. [cyan]Ajuste o nome da coluna CAR (se necessário)[/cyan]
+4. [cyan]Ajuste o nome da coluna que possui o código do imóvel (se necessário)[/cyan]
 5. [cyan]Ajuste o nome do arquivo de output (se necessário)[/cyan]
 """
 
 options = {
     "1": (
-        "Upload de Geometrias",
+        "[bold cyan]🔄 Request[/bold cyan] de Upload de Geometrias",
         "python3 -m request_process.uploads.geometries_upload",
     ),
     "2": (
-        "Desmatamento MapBiomas (batch unificado, unifica e processa as geometrias como um todo)",
+        "[bold cyan]🔄 Request[/bold cyan] de Desmatamento MapBiomas (batch unificado, unifica e processa as geometrias como um todo)",
         "python3 -m request_process.deforestation.batch_deforestation_mapbiomas_batch_request",
     ),
     "3": (
-        "Desmatamento MapBiomas",
+        "[bold cyan]🔄 Request[/bold cyan] de Desmatamento MapBiomas",
         "python3 -m request_process.deforestation.deforestation_mapbiomas_batch_request",
     ),
     "4": (
-        "Desmatamento PRODES",
+        "[bold cyan]🔄 Request[/bold cyan] de Desmatamento PRODES",
         "python3 -m request_process.deforestation.deforestation_prodes_batch_request",
     ),
     "5": (
-        "Relatório Detalhado",
+        "[bold cyan]🔄 Request[/bold cyan] de Relatório Detalhado",
         "python3 -m request_process.detailed_report.report_detailedbatch_request",
     ),
     "6": (
-        "Resultados de Desmatamento",
+        "[bold magenta]📥 Get[/bold magenta] de Resultados de Desmatamento",
         "python3 -m get_process.get_batch_deforestation_results",
     ),
     "7": (
-        "Relatórios Detalhados Gerados",
+        "[bold magenta]📥 Get[/bold magenta] de Relatórios Detalhados Gerados",
         "python3 -m get_process.get_report_detailed_batch",
     ),
     "8": (
-        "Interseção CAR × Área Restrita",
+        "[bold magenta]📥 Get[/bold magenta] de Interseção CAR × Área Restrita (relatório simples)",
         "python3 -m simple_requests.car_intersect_restricted_area",
     ),
-    "9": ("Download de Resultados", "python3 -m download"),
-    "0": ("❌ Sair", None),
+    "9": (
+        "[bold green]⬇️ Download[/bold green] de Resultados",
+        "python3 -m download",
+    ),
+    "0": (
+        "[bold red]❌ Sair[/bold red]",
+        None,
+    ),
 }
 
 
 def print_menu():
     table = Table(
-        title="Menu de Processos",
+        title="📊 Menu de Processos",
         box=box.ROUNDED,
         show_lines=True,
         title_style="bold green",
     )
     table.add_column("Opção", style="cyan bold", width=6, justify="center")
-    table.add_column("Descrição", style="white", no_wrap=True)
+    table.add_column("Descrição", style="white", no_wrap=False)
 
     for key, (desc, _) in options.items():
         table.add_row(f"[bold]{key}[/bold]", desc)
