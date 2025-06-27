@@ -22,7 +22,6 @@ class ReportRestrictionsBatchRequestProcessor(APIClient):
         file_path: str,
         output_file: str,
         car_column: str,
-        sheet_name: str | None = None,
     ):
         super().__init__(access_token, api_url)
         self.file_path = file_path
@@ -35,11 +34,6 @@ class ReportRestrictionsBatchRequestProcessor(APIClient):
         if ext == ".csv":
             self.df = pd.read_csv(file_path, dtype=str)
         elif ext in (".xls", ".xlsx"):
-            if sheet_name:
-                # Lê a aba especificada
-                self.df = pd.read_excel(file_path, sheet_name=sheet_name, dtype=str)
-            else:
-                # Lê a primeira aba por padrão
                 self.df = pd.read_excel(file_path, dtype=str)
         else:
             raise ValueError(f"Formato de arquivo não suportado: {ext!r}")
@@ -111,7 +105,6 @@ if __name__ == "__main__":
     INPUT_FILE = "TROPOC_teste.xlsx"
     OUTPUT_FILE = "TROPOC_teste_report.csv"
     CAR_COLUMN = "CAR"
-    SHEET_NAME = None  # ou "Planilha1", se necessário
 
     # NÃO MODIFICAR
     INPUT_PATH = os.getenv("INPUT_DIR", ".") + "/" + INPUT_FILE
@@ -125,6 +118,5 @@ if __name__ == "__main__":
         file_path=INPUT_PATH,
         output_file=OUTPUT_PATH,
         car_column=CAR_COLUMN,
-        sheet_name=SHEET_NAME,
     )
     processor.processar()
