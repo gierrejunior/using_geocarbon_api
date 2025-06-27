@@ -25,19 +25,17 @@ class ReportRestrictionsOneShotFetcher(APIClient):
         api_url: str,
         file_path: str,
         id_column: str,
-        sheet_name: str | None = None,
     ):
         super().__init__(access_token, api_url)
         self.file_path = file_path
         self.id_column = id_column
-        self.sheet_name = sheet_name
 
         # 1) Carrega o DataFrame do arquivo CSV/Excel
         ext = os.path.splitext(file_path)[1].lower()
         if ext == ".csv":
             df = pd.read_csv(file_path, dtype=str)
         elif ext in (".xls", ".xlsx"):
-            df = pd.read_excel(file_path, sheet_name=sheet_name, dtype=str)
+            df = pd.read_excel(file_path, dtype=str)
         else:
             raise ValueError(f"Formato não suportado: {ext!r}")
 
@@ -168,9 +166,7 @@ if __name__ == "__main__":
     # ↙️ Ajuste aqui para o seu caso:
     INPUT_FILE = "TROPOC_teste_report.csv"
     ID_COLUMN = "restriction_id"
-    SHEET_NAME = (
-        "reportResults"  # se for Excel com várias planilhas, coloque o nome da aba
-    )
+
 
     # NÃO MODIFICAR
     INPUT_PATH = os.getenv("INPUT_DIR", ".") + "/" + INPUT_FILE
@@ -182,6 +178,5 @@ if __name__ == "__main__":
         api_url=API_URL,
         file_path=INPUT_PATH,
         id_column=ID_COLUMN,
-        sheet_name=SHEET_NAME,
     )
     fetcher.processar()
