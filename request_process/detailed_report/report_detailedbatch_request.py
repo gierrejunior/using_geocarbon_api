@@ -34,7 +34,7 @@ class ReportRestrictionsBatchRequestProcessor(APIClient):
         if ext == ".csv":
             self.df = pd.read_csv(file_path, dtype=str)
         elif ext in (".xls", ".xlsx"):
-                self.df = pd.read_excel(file_path, dtype=str)
+            self.df = pd.read_excel(file_path, dtype=str)
         else:
             raise ValueError(f"Formato de arquivo não suportado: {ext!r}")
 

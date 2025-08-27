@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import os
+from typing import Dict, List, Set
 
 import pandas as pd  # type: ignore
 import requests  # type: ignore
@@ -13,19 +14,21 @@ load_dotenv()
 
 class ReportRestrictionsOneShotFetcher(APIClient):
     """
-    A cada execução, faz duas coisas:
-      1) Preenche 'has_intersection' para linhas já COMPLETED no CSV (sem fazer GET).
-      2) Para linhas cujo `taskStatus` != "COMPLETED", faz o GET para /report-detailed/restrictions?id=<uuid>,
-         atualiza `taskStatus`, `reportResults` e atribui `has_intersection`.
+    Fluxo:
+      1) Para linhas já COMPLETED, preenche 'has_intersection' usando 'reportResults' (sem GET).
+      2) Para as demais, faz GET /report-detailed/restrictions?id=<uuid>, atualiza 'taskStatus',
+         'reportResults' (dict quando possível) e 'has_intersection'.
+
+    Saídas em OUTPUT_DIR:
+      - JSON (sempre): <base>_report_detailed_results.json
+      - CSV wide (opcional): <base>_report_detailed_results.csv
+          * Copia TODAS as colunas do CSV de entrada (mesma ordem)
+          * Acrescenta: has_intersection ("true"/"false")
+          * Acrescenta 2 colunas por NAME em with_intersection: "<NAME> hectares" e "<NAME> %"
+          * Acrescenta 2 colunas por ANO em deter: "DETER <ano> hectares" e "DETER <ano> %"
     """
 
-    def __init__(
-        self,
-        access_token: str,
-        api_url: str,
-        file_path: str,
-        id_column: str,
-    ):
+    def __init__(self, access_token: str, api_url: str, file_path: str, id_column: str):
         super().__init__(access_token, api_url)
         self.file_path = file_path
         self.id_column = id_column
@@ -48,44 +51,49 @@ class ReportRestrictionsOneShotFetcher(APIClient):
                 f"Coluna '{id_column}' não encontrada. Colunas disponíveis: {list(df.columns)}"
             )
 
-        # 4) Garante as colunas de status, reportResults e has_intersection
+        # Guardar ordem original das colunas (pra replicar no CSV wide)
+        self.input_columns_order = list(df.columns)
+
+        # 4) Garante colunas auxiliares
         if "taskStatus" not in df.columns:
             df["taskStatus"] = None
         if "reportResults" not in df.columns:
             df["reportResults"] = None
         if "has_intersection" not in df.columns:
-            # Inicializa tudo como False por padrão
-            df["has_intersection"] = False
+            df["has_intersection"] = False  # bool
 
-        # 5) Para todas as linhas que já vêm com taskStatus == "COMPLETED" e têm algo em reportResults,
-        #    preenche o has_intersection com base em "with_intersection" (sem fazer GET).
+        def _maybe_parse_json(x):
+            if isinstance(x, str):
+                s = x.strip()
+                if s and s[0] in "[{":
+                    try:
+                        return json.loads(s)
+                    except json.JSONDecodeError:
+                        return x
+            return x
+
+        # 5) Completa 'has_intersection' para COMPLETED e normaliza 'reportResults'
         for idx, row in df.iterrows():
             status = row.get("taskStatus", "")
-            results_str = row.get("reportResults")
-            # Se já estiver COMPLETED e reportResults não for nulo/vazio, faz parsing
+            results_val = row.get("reportResults")
             if (
                 status == "COMPLETED"
-                and isinstance(results_str, str)
-                and results_str.strip()
+                and isinstance(results_val, str)
+                and results_val.strip()
             ):
-                try:
-                    parsed = json.loads(results_str)
+                parsed = _maybe_parse_json(results_val)
+                df.at[idx, "reportResults"] = parsed
+                if isinstance(parsed, dict):
                     with_int = parsed.get("with_intersection", [])
-                    # Se a lista tiver pelo menos um elemento, marca True
                     df.at[idx, "has_intersection"] = bool(with_int)
-                except json.JSONDecodeError:
-                    # Se parsing falhar, mantém False (ou pode logar um warning aqui)
+                else:
                     df.at[idx, "has_intersection"] = False
 
         self.df = df
 
-    def processar(self) -> None:
+    def processar(self, csv_output: bool = False) -> None:
         """
-        1) Para cada linha cujo taskStatus != COMPLETED:
-             - faz GET ?id=<uuid>
-             - atualiza taskStatus
-             - se COMPLETED, atualiza reportResults e has_intersection
-        2) Linhas que já estavam COMPLETED não passam pelo GET (pois já foram processadas no __init__).
+        Executa GETs pendentes e salva as saídas.
         """
         n = len(self.df)
         print(f"Iniciando one–shot fetch para {n} registros…")
@@ -94,7 +102,7 @@ class ReportRestrictionsOneShotFetcher(APIClient):
             uuid = row[self.id_column]
             status = row.get("taskStatus")
 
-            # Se não há UUID ou já completou, pula (mas o has_intersection já foi preenchido no __init__)
+            # COMPLETED já foi tratado no __init__
             if pd.isna(uuid) or not str(uuid).strip() or status == "COMPLETED":
                 continue
 
@@ -105,7 +113,7 @@ class ReportRestrictionsOneShotFetcher(APIClient):
                     self.api_url,
                     headers=self.headers,
                     params={"id": uuid},
-                    timeout=30,
+                    timeout=180,
                 )
                 resp.raise_for_status()
                 payload = resp.json()
@@ -113,47 +121,192 @@ class ReportRestrictionsOneShotFetcher(APIClient):
 
                 if data_list:
                     rec = data_list[0]
-                    ts = rec.get("taskStatus", "").upper()
+                    ts = str(rec.get("taskStatus", "")).upper()
                     self.df.at[idx, "taskStatus"] = ts
 
                     if ts == "COMPLETED":
                         results = rec.get("reportResults", {})
+                        if isinstance(results, str):
+                            try:
+                                results = json.loads(results)
+                            except json.JSONDecodeError:
+                                pass
 
-                        # Extrai a lista "with_intersection" e marca True/False
-                        with_int = results.get("with_intersection", [])
+                        with_int = []
+                        if isinstance(results, dict):
+                            with_int = results.get("with_intersection", [])
+
                         self.df.at[idx, "has_intersection"] = bool(with_int)
-
-                        # Armazena o JSON de reportResults como string
-                        self.df.at[idx, "reportResults"] = json.dumps(
-                            results, ensure_ascii=False
-                        )
+                        self.df.at[idx, "reportResults"] = results
                         print(f"COMPLETED ✅  has_intersection={bool(with_int)}")
                     else:
-                        # Continua pendente; mantemos has_intersection em False
                         print(f"STATUS={ts} ⏳  has_intersection=False")
                 else:
-                    # Nenhum dado retornado do endpoint; marca NO_DATA
                     self.df.at[idx, "taskStatus"] = "NO_DATA"
-                    # has_intersection já era False
                     print("NO_DATA ⚠️  has_intersection=False")
+
             except requests.RequestException as e:
                 code = getattr(e.response, "status_code", None)
                 err = f"HTTP_ERROR_{code or 'X'}"
                 self.df.at[idx, "taskStatus"] = err
-                # has_intersection continua False
                 print(f"{err} 🚨  has_intersection=False")
             except (json.JSONDecodeError, KeyError, TypeError) as e:
                 self.df.at[idx, "taskStatus"] = "ERROR"
                 print(f"EXCEPTION 🚨 {e}  has_intersection=False")
 
-        # 6) Salva de volta no mesmo arquivo (CSV ou Excel)
-        ext = os.path.splitext(self.file_path)[1].lower()
-        if ext == ".csv":
-            self.df.to_csv(self.file_path, index=False)
-        else:
-            self.df.to_excel(self.file_path, index=False)
+        # === SAÍDAS ===
+        out_dir = os.getenv("OUTPUT_DIR")
+        if not out_dir:
+            raise ValueError("Defina OUTPUT_DIR no .env")
+        os.makedirs(out_dir, exist_ok=True)
 
-        print(f"\nArquivo atualizado salvo em '{self.file_path}'")
+        base = os.path.splitext(os.path.basename(self.file_path))[0]
+
+        # 1) JSON (sempre)
+        json_path = os.path.join(out_dir, f"{base}_report_detailed_results.json")
+        self._save_json(json_path)
+
+        # 2) CSV wide (opcional)
+        if csv_output:
+            csv_path = os.path.join(out_dir, f"{base}_report_detailed_results.csv")
+            self._save_csv_wide(csv_path)
+            print(f"Arquivo CSV salvo em '{csv_path}'")
+
+    # ---------- Helpers de saída ----------
+
+    def _save_json(self, out_path: str) -> None:
+        df_out = self.df.where(pd.notna(self.df), None)
+
+        def _maybe_parse_json(x):
+            if isinstance(x, str):
+                s = x.strip()
+                if s and s[0] in "[{":
+                    try:
+                        return json.loads(s)
+                    except json.JSONDecodeError:
+                        return x
+            return x
+
+        if "reportResults" in df_out.columns:
+            df_out["reportResults"] = df_out["reportResults"].apply(_maybe_parse_json)
+
+        records = df_out.to_dict(orient="records")
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(records, f, ensure_ascii=False, indent=2, allow_nan=False)
+        print(f"\nArquivo JSON salvo em '{out_path}'")
+
+    def _save_csv_wide(self, out_path: str) -> None:
+        """
+        CSV 'wide':
+          - começa com as colunas originais do input (mesma ordem),
+          - acrescenta 'has_intersection' ('true'/'false'),
+          - acrescenta 2 colunas por NAME em with_intersection: '<NAME> hectares' e '<NAME> %',
+          - acrescenta 2 colunas por ANO em deter: 'DETER <ano> hectares' e 'DETER <ano> %'.
+        """
+        # --- 1) Esquema de colunas adicionais ---
+        names_set: Set[str] = set()
+        deter_years_set: Set[int] = set()
+
+        # iterar sobre a coluna reportResults
+        for results in self.df["reportResults"]:
+            if isinstance(results, dict):
+                # with_intersection -> nomes
+                for item in results.get("with_intersection", []) or []:
+                    name = item.get("name")
+                    if name:
+                        names_set.add(str(name))
+
+                # deter -> anos
+                for d in results.get("deter", []) or []:
+                    year = d.get("year")
+                    try:
+                        if year is not None and str(year).strip() != "":
+                            deter_years_set.add(int(year))
+                    except (TypeError, ValueError):
+                        continue
+
+        names = sorted(names_set)
+        deter_years = sorted(deter_years_set)
+
+        # --- 2) Montar registros linha a linha ---
+        output_rows: List[Dict] = []
+        for _, row in self.df.iterrows():
+            out: Dict = {}
+
+            # (a) Colunas originais do input
+            for col in self.input_columns_order:
+                out[col] = row.get(col)
+
+            # (b) has_intersection como string
+            has_int = bool(row.get("has_intersection"))
+            out["has_intersection"] = "true" if has_int else "false"
+
+            # (c) Inicializa colunas de each NAME e DETER year com 0.0
+            for name in names:
+                out[f"{name} hectares"] = 0.0
+                out[f"{name} %"] = 0.0
+
+            for year in deter_years:
+                out[f"DETER {year} hectares"] = 0.0
+                out[f"DETER {year} %"] = 0.0
+
+            # (d) Agrega valores
+            totals_names: Dict[str, Dict[str, float]] = {}
+            totals_deter: Dict[int, Dict[str, float]] = {}
+
+            results = row.get("reportResults")
+            if isinstance(results, dict):
+                # with_intersection
+                for item in results.get("with_intersection", []) or []:
+                    name = item.get("name")
+                    if not name:
+                        continue
+                    ha = float(item.get("ha", 0) or 0)
+                    pct = float(item.get("pct", 0) or 0)
+                    key = str(name)
+                    if key not in totals_names:
+                        totals_names[key] = {"ha": 0.0, "pct": 0.0}
+                    totals_names[key]["ha"] += ha
+                    totals_names[key]["pct"] += pct
+
+                # deter (por ano)
+                for d in results.get("deter", []) or []:
+                    year = d.get("year")
+                    try:
+                        year = int(year)
+                    except (TypeError, ValueError):
+                        year = None
+                    if year is None:
+                        continue
+                    ha = float(d.get("ha", 0) or 0)
+                    pct = float(d.get("pct", 0) or 0)
+                    if year not in totals_deter:
+                        totals_deter[year] = {"ha": 0.0, "pct": 0.0}
+                    totals_deter[year]["ha"] += ha
+                    totals_deter[year]["pct"] += pct
+
+            # (e) Grava agregados
+            for name, agg in totals_names.items():
+                out[f"{name} hectares"] = agg["ha"]
+                out[f"{name} %"] = agg["pct"]
+
+            for year, agg in totals_deter.items():
+                out[f"DETER {year} hectares"] = agg["ha"]
+                out[f"DETER {year} %"] = agg["pct"]
+
+            output_rows.append(out)
+
+        # --- 3) Ordem final das colunas ---
+        final_cols = list(self.input_columns_order) + ["has_intersection"]
+        for name in names:
+            final_cols.append(f"{name} hectares")
+            final_cols.append(f"{name} %")
+        for year in deter_years:
+            final_cols.append(f"DETER {year} hectares")
+            final_cols.append(f"DETER {year} %")
+
+        csv_df = pd.DataFrame(output_rows, columns=final_cols)
+        csv_df.to_csv(out_path, index=False)
 
 
 if __name__ == "__main__":
@@ -164,9 +317,13 @@ if __name__ == "__main__":
     API_URL = f"{os.getenv('API_BASE_URL')}/report-detailed/restrictions"
 
     # ↙️ Ajuste aqui para o seu caso:
-    INPUT_FILE = "TROPOC_teste_report.csv"
+    INPUT_FILE = "car_tropoc_base_1100_IDreportcompleto_3.csv"
     ID_COLUMN = "restriction_id"
 
+    # ✅ Flag para gerar CSV wide além do JSON (coloque aqui ANTES do 'NÃO MODIFICAR')
+    CSV_OUTPUT = True  # ou False
+    # (se quiser por .env, poderia usar:)
+    # CSV_OUTPUT = os.getenv("CSV_OUTPUT", "false").strip().lower() in {"1","true","yes","y"}
 
     # NÃO MODIFICAR
     INPUT_PATH = os.getenv("INPUT_DIR", ".") + "/" + INPUT_FILE
@@ -179,4 +336,4 @@ if __name__ == "__main__":
         file_path=INPUT_PATH,
         id_column=ID_COLUMN,
     )
-    fetcher.processar()
+    fetcher.processar(csv_output=CSV_OUTPUT)

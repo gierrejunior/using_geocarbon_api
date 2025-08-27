@@ -171,12 +171,12 @@ if __name__ == "__main__":
 
     # MODIFICAR SE NECESSÁRIO
     # ENTITY_TYPE = "DeforestationAnalysis"  # Tipo de entidade para mapbiomas
-    ENTITY_TYPE = "DeforestationAnalysisProdes" # Tipo de entidade para Prodes
-    # ENTITY_TYPE = "ReportRestrictionsDetailed" # Tipo relatorio detalhado
+    # ENTITY_TYPE = "DeforestationAnalysisProdes" # Tipo de entidade para Prodes
+    ENTITY_TYPE = "ReportRestrictionsDetailed" # Tipo relatorio detalhado
 
     # MODIFICAR
-    INPUT_FILE = "Tropoc_Geo_2024_prodes.csv"  # Pode ser um CSV ou Excel
-    OUTPUT_FILE = "Tropoc_Geo_2024_prodes_DOWNLOAD.csv"
+    INPUT_FILE = "maos_area1_2008_2023_download.csv"  # Pode ser um CSV ou Excel
+    OUTPUT_FILE = "maos_area1_2008_2023_download_2.csv"
     ID_COLUMN = "deforestation_prodes"  # Nome da coluna com os IDs
     SOMENTE_LINK = False  # Se True, apenas gera a coluna com link e não faz o download dos arquivos
 
